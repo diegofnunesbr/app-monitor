@@ -2,7 +2,7 @@
 
 Monitora endpoints `/manage/health` (Spring Boot Admin) e envia alertas no Microsoft Teams quando instâncias ficam DOWN ou voltam UP.
 
-A lista de URLs fica em **`config/instances.yaml`** (desenvolvimento) ou montada em **`/config/instances.yaml`** no Docker — uma URL `https://` por linha, ou bloco `services:` / `urls:` no YAML.
+As URLs monitoradas definem-se em **`instances.yaml`**: em desenvolvimento o programa lê esse ficheiro diretamente; no Docker, monta o mesmo ficheiro em **`/app/instances.yaml`**. Podes usar uma URL `https://` por linha ou um YAML com `services:` ou `urls:`.
 
 ## Estrutura do repositório
 
@@ -12,8 +12,7 @@ app-monitor/
 │   ├── app_monitor.py
 │   ├── config_loader.py
 │   └── health_checker.py
-├── config/
-│   └── instances.yaml
+├── instances.yaml   # local / volume (não versionado)
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
@@ -37,7 +36,7 @@ python app/app_monitor.py
 ## Observações
 
 - Compatível com o JSON de health do Spring Boot Admin.
-- O arquivo com URLs reais `config/instances.yaml` está no `.gitignore`.
+- O arquivo com URLs reais `instances.yaml` (raiz) está no `.gitignore`.
 - **Prod vs não-prod:** o hostname é partido por `.` em rótulos. Se algum rótulo for `qa`, `stg` ou `dev` → não-prod. Se não, há uma lista extra que só olha para o primeiro rótulo (instâncias e nomes compostos).
 
 ## Variáveis de ambiente
@@ -62,7 +61,7 @@ docker run -d \
   --restart unless-stopped \
   --name app-monitor \
   -e TEAMS_WEBHOOK="https://webhook.office.com/..." \
-  -v "$(pwd)/config/instances.yaml:/config/instances.yaml" \
+  -v "$(pwd)/instances.yaml:/app/instances.yaml" \
   app-monitor
 ```
 

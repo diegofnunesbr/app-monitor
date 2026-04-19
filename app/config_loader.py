@@ -95,14 +95,14 @@ def load_services_from_file(path):
         return []
     return _services_from_parsed_data(data)
 
-_INSTANCES_PATHS = ("/config/instances.yaml", "config/instances.yaml")
+_INSTANCES_FILE = "instances.yaml"
 
 def load_services():
-    for path in _INSTANCES_PATHS:
-        if Path(path).is_file():
-            return load_services_from_file(path)
-    tried = ", ".join(_INSTANCES_PATHS)
+    path = Path(_INSTANCES_FILE)
+    if path.is_file():
+        return load_services_from_file(path)
     raise FileNotFoundError(
-        f"instances.yaml not found (tried: {tried}). "
-        "Create config/instances.yaml or mount the file at /config/instances.yaml in Docker."
+        f"{_INSTANCES_FILE} not found (cwd: {Path.cwd()}). "
+        "Locally: create it next to Dockerfile. Docker: bind-mount your repo-root file to "
+        "/app/instances.yaml (container WORKDIR is /app; that path is inside the container only)."
     )
